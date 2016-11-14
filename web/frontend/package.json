@@ -1,0 +1,30 @@
+{
+  "name": "jardineitor-frontend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "budo src/index.js:jardineitor.js -d ./html -v --live -- -t sassify -t babelify",
+    "compile": "browserify -t babelify -t sassify -e src/index.js -o output/jardineitor.js",
+    "watch": "browserify -t babelify -t sassify -e src/index.js -o output/jardineitor.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.15.2",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.1",
+    "budo": "^9.2.1",
+    "bulma": "^0.2.3",
+    "classnames": "^2.2.5",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "sassify": "^2.0.0",
+    "socket.io-client": "^1.5.1",
+    "svg-gauge": "^1.0.2",
+    "timeout-as-promise": "^1.0.0",
+    "watchify": "^3.7.0"
+  }
+}

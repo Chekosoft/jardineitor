@@ -1,0 +1,35 @@
+@import 'bulma';
+
+.invisible {
+  visibility: hidden;
+}
+
+.gauge-container {
+  width: 50%;
+  height: 300px;
+  display: block;
+  padding: 10px;
+  margin: 0px auto;
+}
+
+.gauge-container > .gauge > .dial {
+  stroke-width: 50px;
+  fill: rgba(0,0,0,0);
+  stroke: #eee;
+}
+.gauge-container > .gauge > .value {
+  stroke-width: 50px;
+  fill: rgba(0,0,0,0);
+  &.light {
+    stroke: #C9DE3C;
+  }
+  &.moist {
+    stroke: rgb(47, 227, 255);
+  }
+}
+.gauge-container > .gauge > .value-text {
+  fill: rgb(0, 0, 0);
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 8em;
+}
