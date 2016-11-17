@@ -7,32 +7,19 @@ int SERIAL_FREQ = 9600;
 
 //Pin locations
 int LIGHT_PIN = 1;
-int MOISTURE_PIN = 2;
+int MOISTURE_PIN = 0;
 int RELAY_PIN = 5;
 
-//Measure configuration
-int PREVIOUS_TIME = 0;
-int MEASURE_TIME = 1000;
-int LOOP_NBR = 0;
-int CURRENT_MEASURE = 0;
-int MEASURES_NBR = 5;
-
-int LIGHT_MEASURES[] = {
-  0, 0, 0, 0, 0
-};
-
-int MOISTURE_MEASURES[] = {
-  0, 0, 0, 0, 0
-};
 
 //Ethernet configuration
 byte MAC_ETHERNET[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xD0, 0x0D
 };
 
-byte SERVER[] = {192, 168, 1, 100};
-char CHECK_WATER_STATUS[] = "/arduino/water";
-int NETWORK_TIMEOUT = 30 * 1000;
+byte SERVER[] = {192, 168, 1, 132};
+char CHECK_WATER_URL[] = "/arduino/water";
+char SEND_DATA_URL[] = "/arduino/status";
+char STATUS_SEND[20];
 
 EthernetClient ethClient;
 
@@ -52,31 +39,17 @@ void setup() {
   
 }
 
-void takeMeasure() {
-  LIGHT_MEASURES[CURRENT_MEASURE] = analogRead(LIGHT_PIN);
-  MOISTURE_MEASURES[CURRENT_MEASURE] = analogRead(MOISTURE_PIN);
-  Serial.print("Medicion actual ");
-  Serial.print("Luz: ");
-  Serial.println(LIGHT_MEASURES[CURRENT_MEASURE]);
-  Serial.print("Humedad: ");
-  Serial.println(MOISTURE_MEASURES[CURRENT_MEASURE]);
-  
-  CURRENT_MEASURE += 1;
-  if(CURRENT_MEASURE == MEASURES_NBR) {
-    int light_sum = 0;
-    int moisture_sum = 0;
-    
-    CURRENT_MEASURE = 0;
-    
-    for(int i = 0; i < MEASURES_NBR; i++) {
-      light_sum += LIGHT_MEASURES[i];
-      moisture_sum += MOISTURE_MEASURES[i];
-    }
-    float light_result = (light_sum / MEASURES_NBR);
-    float moisture_result = (moisture_sum / MEASURES_NBR);
-    if(light_result < 299) {
-      waterPlant();
-    }    
+void sendMeasure() {
+  int lightMeasure = analogRead(LIGHT_PIN);
+  int moistureMeasure = analogRead(MOISTURE_PIN);
+  sprintf(STATUS_SEND, "%d;%d", lightMeasure, moistureMeasure);
+  Serial.println(STATUS_SEND);
+  HTTPClient http("", SERVER, 3389);
+  FILE* result = http.postURI(SEND_DATA_URL, NULL, STATUS_SEND, NULL);
+  int returnCode = http.getLastReturnCode();
+  Serial.println(returnCode);
+  if(result != NULL) {
+      http.closeStream(result);
   }
 }
 
@@ -101,14 +74,14 @@ bool needsToWaterPlant() {
   char response[5] = {'\0'};
   HTTPClient http("", SERVER, 3389);
 
-  FILE* result = http.getURI("/arduino/water");
+  FILE* result = http.getURI(CHECK_WATER_URL);
   int status = http.getLastReturnCode();
   if(result != NULL) {
     fscanf(result, "%s", response);
     http.closeStream(result);
   }
   Serial.println(response);
-  if(!strcmp(response, "yes") || strlen(response) == 0) {
+  if(strcmp(response, "yes") || !strlen(response)) {
     return false;
   } else {
     return true;
@@ -121,6 +94,6 @@ void loop() {
   if(needsWater) {
     waterPlant();
   }
-  //takeMeasure();
+  sendMeasure();
   delay(1000);
 }

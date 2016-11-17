@@ -22,40 +22,14 @@ export default class StatusGauges extends React.Component {
       min: -1,
       max: 1023,
       value: this.state.moist,
-      valueDialClass: 'value moist',
-      label: function(value) {
-        if(value == -1 ) {
-          return 'Sin datos';
-        } else if (0 < value && value <= 250) {
-          return 'Bajo';
-        } else if (250 < value && value <= 500 ) {
-          return 'Medio-Bajo';
-        } else if (500 < value && value <= 750) {
-          return 'Medio-Alto';
-        } else {
-          return 'Alto'
-        }
-      }
+      valueDialClass: 'value moist'
     });
 
     this.lightGauge = Gauge(this.lightGaugePlaceholder, {
       min: -1,
       max: 1023,
       value: this.state.moist,
-      valueDialClass: 'value light',
-      label: function(value) {
-        if(value == -1 ) {
-          return 'Sin datos';
-        } else if (0 < value && value <= 250) {
-          return 'Bajo';
-        } else if (250 < value && value <= 500 ) {
-          return 'Medio-Bajo';
-        } else if (500 < value && value <= 750) {
-          return 'Medio-Alto';
-        } else {
-          return 'Alto'
-        }
-      }
+      valueDialClass: 'value light'
     });
 
     this.props.parent.ws.on('update_status', (message) => {

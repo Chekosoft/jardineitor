@@ -6,6 +6,8 @@ import delay from 'timeout-as-promise';
 import WaterButton from './WaterButton.jsx';
 import EventTable from './EventTable.jsx';
 import StatusGauges from './StatusGauges.jsx';
+import Calendar from './Calendar.jsx';
+import CalendarCreate from './CalendarCreate.jsx';
 
 
 export default class Jardineitor extends React.Component {
@@ -17,10 +19,13 @@ export default class Jardineitor extends React.Component {
         show: false,
         type: 'general',
         message: 'asdf'
-      }
+      },
+      showCreateForm: false
     };
 
     this.ws = io('http://localhost:3389');
+    this.setNotification = this.setNotification.bind(this);
+    this.showCreateForm = this.showCreateForm.bind(this);
   }
 
   setNotification(message, type='info') {
@@ -40,10 +45,21 @@ export default class Jardineitor extends React.Component {
     });
   }
 
+  showCreateForm() {
+    this.setState({
+      showCreateForm: true
+    });
+  }
+
   render() {
 
-    let {alert} = this.state;
+    let {alert, showCreateForm} = this.state;
+    let createForm = null;
     let self = this;
+
+    if(showCreateForm) {
+      createForm = <CalendarCreate parent={this} />
+    }
 
     let notificationClass = classnames('notification', {
       'invisible': !alert.show,
@@ -73,14 +89,19 @@ export default class Jardineitor extends React.Component {
         </nav>
 
         <section className="section">
-          <div className="tile is-ancestor">
-            <div className="tile is-parent is-vertical is-4">
-              <div className="tile is-child panel">
+          <div className="columns max-height-setter">
+            <div className="column full-height is-3 is-offset-3">
+              <div className="panel half-height">
                 <h2 className="panel-heading">
-                  Calendario de regado
+                  Riegos Programados para Hoy.
+                  <button className="button is-primary is-pulled-right"
+                    onClick={self.showCreateForm}>Agregar fecha</button>
                 </h2>
+                <div className="panel-block">
+                  <Calendar parent={this} />
+                </div>
               </div>
-              <div className="tile is-child panel">
+              <div className="panel half-height hide-overflow">
                 <h2 className="panel-heading">
                   Historia de eventos
                 </h2>
@@ -89,13 +110,8 @@ export default class Jardineitor extends React.Component {
                 </div>
               </div>
             </div>
-            <div className="tile is-vertical is-parent is-4">
-              <div className="tile is-child box">
-                <WaterButton parent={self} />
-              </div>
-            </div>
-            <div className="tile is-vertical is-parent is-4">
-              <div className="tile is-child panel">
+            <div className="column full-height is-3">
+              <div className="panel full-height">
                 <h2 className="panel-heading">
                   Estado de la planta
                 </h2>
@@ -106,6 +122,7 @@ export default class Jardineitor extends React.Component {
             </div>
           </div>
         </section>
+        {createForm}
       </div>
     )
   }

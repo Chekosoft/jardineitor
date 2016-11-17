@@ -32,9 +32,10 @@ export default class EventTable extends React.Component {
 
   componentDidMount() {
     this.props.parent.ws.on('new_event', (message) => {
-      let entries = [message.event, ...this.state.entries];
+      let entries = this.state.entries;
+      entries.shift();
       this.setState({
-        entries
+        entries: [message.event, ...entries]
       });
     })
   }
@@ -81,17 +82,19 @@ export default class EventTable extends React.Component {
     }
 
     return (
-      <table className="table is-striped">
-        <thead>
-          <tr>
-            <th>Fecha de Evento</th>
-            <th>Tipo de Evento</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries}
-        </tbody>
-      </table>
+      <div className="content">
+        <table className="table is-striped full-height fixed-headers">
+          <thead>
+            <tr>
+              <th>Fecha de Evento</th>
+              <th>Tipo de Evento</th>
+            </tr>
+          </thead>
+          <tbody>
+            {entries}
+          </tbody>
+        </table>
+      </div>
     )
   }
 }
